@@ -5,7 +5,8 @@ from gibson2.core.render.mesh_renderer.mesh_renderer_cpu import MeshRenderer
 from gibson2.core.render.profiler import Profiler
 
 if __name__ == '__main__':
-    model_path = sys.argv[1]
+    #model_path = sys.argv[1]
+    model_path = "/home/charliecao988/assets/models/laikago/hip_motor.obj"
     renderer = MeshRenderer(width=512, height=512)
     renderer.load_object(model_path)
     renderer.add_instance(0)

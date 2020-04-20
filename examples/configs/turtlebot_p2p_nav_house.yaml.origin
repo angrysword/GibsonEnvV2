@@ -10,7 +10,7 @@ velocity: 0.1
 task: pointgoal # pointgoal|objectgoal|areagoal|reaching
 fisheye: false
 
-initial_pos: [1.0, -1.0, 0.0]
+initial_pos: [-1.0, -1.0, 0.0]
 initial_orn: [0.0, 0.0, 0.0]
 
 target_pos: [1.0, 1.0, 0.0]
@@ -43,7 +43,7 @@ fov: 90
 
 # display
 use_filler: true
-display_ui: true
+display_ui: false
 show_diagnostics: false
 ui_num: 2
 ui_components: [RGB_FILLED, DEPTH]

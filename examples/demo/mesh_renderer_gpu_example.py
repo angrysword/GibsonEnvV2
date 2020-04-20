@@ -7,7 +7,9 @@ import matplotlib.pyplot as plt
 import torch
 
 if __name__ == '__main__':
-    model_path = sys.argv[1]
+    #model_path = sys.argv[1]
+
+    model_path = "/home/charliecao988/assets/models/laikago/hip_motor.obj"
     renderer = MeshRendererG2G(width=512, height=512, device_idx=0)
     renderer.load_object(model_path)
     renderer.add_instance(0)
