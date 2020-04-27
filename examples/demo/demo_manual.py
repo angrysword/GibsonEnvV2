@@ -13,12 +13,17 @@ if __name__ == "__main__":
         nav_env.reset()
         for i in range(300):    # 300 steps, 30s world time
             s = time()
-            action = nav_env.action_space.sample()
+            #action = nav_env.action_space.sample()
+            print("input speed:")
+            action=input().split()
+            repeat=1
+            if(len(action)>2):
+                repeat=action[2]
             action=np.array([float(action[0]),float(action[1])])
-            ts = nav_env.step(action)
-            print("step/reward: %s/%s"%(i,ts[1]))
-            print(ts[1], 1 / (time() - s))
-            if ts[2]:
-                print("Episode finished after {} timesteps".format(i + 1))
-                break
+            for i in range(int(repeat)):
+                ts = nav_env.step(action)
+                print(ts, 1 / (time() - s))
+                if ts[2]:
+                    print("Episode finished after {} timesteps".format(i + 1))
+                    break
     nav_env.clean()

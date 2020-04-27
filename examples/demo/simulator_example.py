@@ -11,7 +11,8 @@ from gibson2.core.render.profiler import Profiler
 config = parse_config('../configs/turtlebot_p2p_nav.yaml')
 
 s = Simulator(mode='gui', resolution=512, render_to_tensor=False)
-scene = BuildingScene('Bolton')
+#scene = BuildingScene('Bolton')
+scene = BuildingScene('Ohoopee')
 s.import_scene(scene)
 turtlebot = Turtlebot(config)
 s.import_robot(turtlebot)
