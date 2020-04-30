@@ -7,14 +7,14 @@ within following context: like environment and current position and so on
 '''
 import numpy as np
 import random
+import tensorflow as tf
+from tensorflow.keras import datasets, layers, models
+
+
 
 BATCH_SIZE=100
 
 
-class neural_network(self):
-    def __init__(self):
-        super().__init__()
-    pass
 
 class agent_brain(self):
     def __init__(self,is_continue_training):
@@ -23,8 +23,8 @@ class agent_brain(self):
             pass #load network
 
         #initiate network
-        self.training_net=neural_network()
-        self.matural_net=neural_network()
+        self.training_net=_build_net()
+        self.matural_net=_build_net()
 
         
     def suggest_action(self,cur_observation):
@@ -68,5 +68,44 @@ class agent_brain(self):
         self.training_net.save_weights()
         self.matural_net.set_weights(self.training_net.get_weights())
 
+    def _build_net(self):
+        model = models.Sequential()
+        #??? one proble for this network, we do not know how to seperate goal
+        model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(128, 128, 3)))
+        model.add(layers.MaxPooling2D((2, 2)))
+        model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        model.add(layers.MaxPooling2D((2, 2)))
+        model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        model.add(layers.Flatten())
+        model.add(layers.Dense(64, activation='relu'))
 
+
+        #??? tanh may not be a good activation function
+        model.add(layers.Dense(2,activation='tanh')
+
+
+        # Calculate the loss
+        # Total loss = Policy gradient loss - entropy * entropy coefficient + Value coefficient * value loss
+
+        # Policy loss
+        neglogpac = train_model.pd.neglogp(A)
+        # L = A(s,a) * -logpi(a|s)
+        pg_loss = tf.reduce_mean(ADV * neglogpac)
+
+        # Entropy is used to improve exploration by limiting the premature convergence to suboptimal policy.
+        entropy = tf.reduce_mean(train_model.pd.entropy())
+
+        # Value loss
+        vf_loss = losses.mean_squared_error(tf.squeeze(train_model.vf), R)
+
+        loss = pg_loss - entropy*ent_coef + vf_loss * vf_coef
+
+
+
+        #??? do not know how to set the loss function.
+        model.compile(optimizer='adam',loss='mse',metrics=['accuracy'])
+        
+        return model
+
+ 
 

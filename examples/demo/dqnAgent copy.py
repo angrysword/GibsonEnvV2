@@ -1,19 +1,15 @@
 '''
 I consider this is the agent or robot. the basic function of robot is
+
 Given an environment, goal. robot can eventually reach the goal
 To do that, robot first leads to 
 1. learning the environment and store what he learned
-    1.1. we need generate some sample but not too random. so we design a nerual network to generate a searial of action as a training sample
-          sample agent will do this. just give a lot of action and so on.
-
-    1.2 first agent have a pi function. which is policy function. 
-    1.3. agent will update policy base on something
 2. action when the goal is set base on the learning
+
 
 But let me finished the learning agent first
 
-
-
+The current agent can not work on continue function. that is why I work on a new one
 '''
 
 import numpy as np
