@@ -69,13 +69,6 @@ class dqnAgent(self):
         self.cur_observe=observe
 
     def next_action(self,current_observe):
-        #ramdom action
-        if(self.isnewbie or np.random.rand()<self.episolon):
-            action=self.action_space.sample()
-            action=np.array([float(action[0]),float(action[1])])
-            return action 
-
-        #base on learning action
         return brain.suggest_action(current_observe)
 
 

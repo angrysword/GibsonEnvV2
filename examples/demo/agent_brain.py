@@ -8,7 +8,8 @@ within following context: like environment and current position and so on
 import numpy as np
 import random
 import tensorflow as tf
-from tensorflow.keras import datasets, layers, models
+from tensorflow.keras import datasets, layers, models,optimizers
+import tensorflow_probability as tfp
 
 
 
@@ -23,52 +24,48 @@ class agent_brain(self):
             pass #load network
 
         #initiate network
-        self.training_net=_build_net()
-        self.matural_net=_build_net()
+        self.critic=_build_critic_net()
+        self.actor=_build_actor_net()
+
+        self.actor.compile(optimizer=optimizers.RMSprop(lr=0.005),loss=self._actor_loss)
+        self.critic.compile(optimizer=optimizers.RMSprop(lr=0.005),loss=self._critic_loss)
 
         
     def suggest_action(self,cur_observation):
-        multiple_acts_rewards=self.matural_net.predict(cur_observation)
-        action=np.argmax(multiple_acts_rewards) #get reward max action
+        mu,sigma=self.actor.predict(cur_observation)
+        sigma=tf.math.exp(sigma)
+        action_probs=tfp.distributions.Normal(mu,sigma)
+        probs=action_probs.sample([2])
+        self.log_probs=action_probs.log_probs(probs)
+        action=tf.math.tanh(probs)
+        return(action)
 
-    def learning_now(self,memory):
-        batch = np.asarray(random.sample(memory, BATCH_SIZE))
-
-        cur_observes= []
-        actions=[]
-        max_q_values = []
-
-        #training problem
-        # we have training date Xobserve=Yreward with continue action space.
         
-        for entry in batch:
 
-            cur_observes.append(entry['cur_observe'])            
-            actions.append(entry['action'])
-            next_observe=entry['next_observe']
+    def learning_now(self,observe,action,reward,new_observe,done):
+        critical_value_=self.critic.predict(new_observe)
+        critical_value=self.critic.predict(observe)
+        factor=self.gamma*(1-(int)done)
+        delta=reward+factor*critical_value_-critical_value
 
-            #multiple actions. think about continue action:https://stackoverflow.com/questions/7098625/how-can-i-apply-reinforcement-learning-to-continuous-action-spaces
+        actor_loss=-self.log_probs*delta
+        critic_loss=delta**2
 
-            multiple_actions=[]
-            multiple_acts_rewards= self.matural_net.predict(next_observe)
-            future_reward=np.max(multiple_acts_rewards)
+        loss=actor_loss+critic_loss
 
-
-            if entry["terminal"]:
-                all_reward= entry["reward"]
-            else:
-                all_reward= entry["reward"] + GAMMA *future_reward 
-            max_q_values.append(all_reward)
-
-            #data have prepared
+        #need to know how to backward this
         
-        self.training_net.fit(cur_observes,max_q_values)
-    
+        self.actor.fit([observe,delta],action,verbose=0)
+        self.critic.fit(observe,reward,verbose=0)
+
+   
     def save_training(self):
         self.training_net.save_weights()
         self.matural_net.set_weights(self.training_net.get_weights())
 
-    def _build_net(self):
+    def _critic_loss(self):
+
+    def _build_critic_net(self):
         model = models.Sequential()
         #??? one proble for this network, we do not know how to seperate goal
         model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(128, 128, 3)))
@@ -79,9 +76,30 @@ class agent_brain(self):
         model.add(layers.Flatten())
         model.add(layers.Dense(64, activation='relu'))
 
+        #no needed activation function. just have two output. one is mean another is standard variation
+        model.add(layers.Dense(1)
 
-        #??? tanh may not be a good activation function
-        model.add(layers.Dense(2,activation='tanh')
+        
+
+        return(model)
+
+    
+
+    def _build_actor_net(self):
+        model = models.Sequential()
+        #??? one proble for this network, we do not know how to seperate goal
+        model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(128, 128, 3)))
+        model.add(layers.MaxPooling2D((2, 2)))
+        model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        model.add(layers.MaxPooling2D((2, 2)))
+        model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        model.add(layers.Flatten())
+        model.add(layers.Dense(64, activation='relu'))
+
+        #no needed activation function. just have two output. one is mean another is standard variation
+        model.add(layers.Dense(2)
+
+        return(model)
 
 
         # Calculate the loss
